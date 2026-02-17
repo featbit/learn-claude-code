@@ -118,6 +118,26 @@ v0(196) -> v1(417) -> v2(531) -> v3(623) -> v4(783)
 
 ## 快速开始
 
+### 快速理解核心机制
+
+如果你想快速理解 Claude Code 的 **"不等他结束，完全在过程中互动"** 运行机制：
+
+```bash
+# 运行交互式演示（无需 API Key）
+python demo_interactive_mechanism.py
+
+# 演示内容：
+# 1. 串行模式 vs 并行模式的对比
+# 2. 后台执行的实际效果
+# 3. 通知总线的工作方式
+# 4. 灵活的阻塞/非阻塞控制
+
+# 然后阅读详细指南
+# docs/claude-code-交互机制学习指南.md
+```
+
+### 完整项目运行
+
 ```bash
 # 克隆仓库
 git clone https://github.com/shareAI-lab/learn-claude-code
@@ -131,18 +151,18 @@ cp .env.example .env
 # 编辑 .env 填入你的 ANTHROPIC_API_KEY
 
 # 运行任意版本
-python v0_bash_agent.py      # 极简版（从这里开始！）
-python v1_basic_agent.py     # 核心 Agent 循环
-python v2_todo_agent.py      # + Todo 规划
-python v3_subagent.py           # + 子代理
-python v4_skills_agent.py       # + Skills
-python v5_compression_agent.py  # + 上下文压缩
-python v6_tasks_agent.py        # + 任务系统
-python v7_background_agent.py   # + 后台任务
-python v8a_team_foundation.py  # + 团队基础
-python v8b_messaging.py        # + 团队通信
-python v8c_coordination.py     # + 团队协调
-python v9_autonomous_agent.py  # + 自治团队
+python agents/v0_bash_agent.py      # 极简版（从这里开始！）
+python agents/v1_basic_agent.py     # 核心 Agent 循环
+python agents/v2_todo_agent.py      # + Todo 规划
+python agents/v3_subagent.py        # + 子代理
+python agents/v4_skills_agent.py    # + Skills
+python agents/v5_compression_agent.py  # + 上下文压缩
+python agents/v6_tasks_agent.py     # + 任务系统
+python agents/v7_background_agent.py   # + 后台任务（核心机制所在）
+python agents/v8a_team_foundation.py  # + 团队基础
+python agents/v8b_messaging.py        # + 团队通信
+python agents/v8c_coordination.py     # + 团队协调
+python agents/v9_autonomous_agent.py  # + 自治团队
 ```
 
 ## 运行测试
@@ -245,6 +265,15 @@ learn-claude-code/
 ```
 
 ## 深入阅读
+
+### 🎯 特别推荐：核心机制学习指南
+
+- **[Claude Code 交互机制学习指南](./docs/claude-code-交互机制学习指南.md)** - 深入理解 "不等他结束，完全在过程中互动" 的运行机制
+  - 从串行到并行的演进
+  - 后台执行与通知总线的技术实现
+  - 实际应用场景与性能对比
+  - 与传统编程模式的类比
+  - 配套 [交互式演示脚本](./demo_interactive_mechanism.py) 可直接运行
 
 ### 技术文档 (docs/)
 
