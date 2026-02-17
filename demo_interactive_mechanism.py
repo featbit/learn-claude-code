@@ -20,6 +20,18 @@ import uuid
 
 
 # =============================================================================
+# 常量定义
+# =============================================================================
+
+# 任务 ID 前缀约定
+AGENT_PREFIX = "a"  # 子代理任务
+BASH_PREFIX = "b"   # bash 命令任务
+
+# 默认超时时间
+DEFAULT_TIMEOUT = 30  # 秒
+
+
+# =============================================================================
 # 简化版 BackgroundManager（演示用）
 # =============================================================================
 
@@ -41,10 +53,11 @@ class BackgroundManager:
         self._notifications: Queue = Queue()
         self._lock = threading.Lock()
     
-    def run_in_background(self, func, task_name: str, task_type: str = "a") -> str:
+    def run_in_background(self, func, task_name: str, task_type: str = "agent") -> str:
         """在后台线程中运行函数，立即返回 task_id"""
-        prefix = {"bash": "b", "agent": "a"}.get(task_type, "a")
-        task_id = f"{prefix}{uuid.uuid4().hex[:6]}"
+        prefix = {"bash": BASH_PREFIX, "agent": AGENT_PREFIX}.get(task_type, AGENT_PREFIX)
+        # 使用 8 字符的 UUID 片段以减少碰撞可能性
+        task_id = f"{prefix}{uuid.uuid4().hex[:8]}"
         
         bg_task = BackgroundTask(task_id=task_id, task_name=task_name)
         
@@ -78,7 +91,7 @@ class BackgroundManager:
         thread.start()
         return task_id
     
-    def get_output(self, task_id: str, block: bool = True, timeout: int = 30) -> dict:
+    def get_output(self, task_id: str, block: bool = True, timeout: int = DEFAULT_TIMEOUT) -> dict:
         """获取后台任务结果"""
         with self._lock:
             bg_task = self._tasks.get(task_id)
@@ -88,7 +101,14 @@ class BackgroundManager:
         
         if block and bg_task.status == "running":
             print(f"  [主 Agent] 等待 {task_id} 完成...")
-            bg_task.event.wait(timeout=timeout)
+            # wait() 返回 True 表示在超时前完成，False 表示超时
+            completed = bg_task.event.wait(timeout=timeout)
+            if not completed and bg_task.status == "running":
+                return {
+                    "task_id": task_id,
+                    "status": "timeout",
+                    "output": f"任务在 {timeout} 秒超时时间内未完成",
+                }
         
         return {
             "task_id": task_id,
@@ -335,6 +355,8 @@ def demo_notification_bus():
 # =============================================================================
 
 def main():
+    # 注意：需要 UTF-8 编码支持以正确显示框线字符
+    # 如果终端不支持，可以使用简单的等号线作为替代
     print("\n╔════════════════════════════════════════════════════════════════════════╗")
     print("║  Claude Code 交互机制演示 - '不等他结束，完全在过程中互动'          ║")
     print("╚════════════════════════════════════════════════════════════════════════╝")
